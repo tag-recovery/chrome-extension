@@ -12,9 +12,7 @@
       "48": "src/assets/img/Favicon-32x32.png"
     }
   },
-  "permissions": [
-    "storage"
-  ],
+  "permissions": [],
   "host_permissions": ["https://*.dreamwidth.org/*"],
   "content_scripts": [
     {
