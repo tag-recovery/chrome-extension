@@ -3,6 +3,7 @@
   "name": "Tag Recovery",
   "version": "0.1.0",
   "description": "Retrieve text from DW forms",
+
   "action": {
     "default_title": "Tag Recovery",
     "default_popup": "index.html",
@@ -12,12 +13,6 @@
       "48": "src/assets/img/Favicon-32x32.png"
     }
   },
-  "permissions": [
-    "storage",
-    "tabs",
-    "scripting"
-  ],
-  "host_permissions": ["https://*.dreamwidth.org/*"],
   "content_scripts": [
     {
       "matches": ["https://*.dreamwidth.org/*"],
@@ -25,6 +20,9 @@
       "run_at": "document_end",
       "all_frames": true
     }
+  ],
+  "permissions" : [
+    "storage"
   ],
   "web_accessible_resources": [
     {

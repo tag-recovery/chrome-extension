@@ -5,16 +5,18 @@ import {
   grabElements,
   debounce,
   createTag,
+  grabExpValue,
 } from "./iconHelpers";
 import storeProxy from "./store";
 
 const elements = grabElements();
 let { username, textarea, prevTextArea, dwrpTools } = elements;
 
-export function registerIcon() {
+export function registerIcon(expDaysValue) {
+  storeProxy.expDays = expDaysValue;
   injectIcon(storeProxy.data);
   injectRecordEventListeners({ ...elements, value: [] });
-  storeProxy.data = loadStorage(username);
+  storeProxy.data = loadStorage(username, storeProxy.expDays);
 
   /*
   WAITS A SET AMT OF INACTIVE TIME,

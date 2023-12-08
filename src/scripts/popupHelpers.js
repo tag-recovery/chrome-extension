@@ -1,29 +1,5 @@
 import whiteLogo from "./../assets/img/main-logo-white-transparent.svg";
 
-/* 
-RETIREVES STORAGE OBJECT 
-BY CURRENT USER
-IF NO STORAGE,
-CREATES EMPTY STARTER
-*/
-export function loadStorage() {
-  const result = JSON.parse(localStorage.getItem("expDays"));
-  if (result) {
-    return { expDays: result };
-  } else {
-    localStorage.setItem("expDays", JSON.stringify(5));
-    return { expDays: 5 };
-  }
-}
-
-/*
-SAVES CURRENT STORE VALUE
-TO STORAGE
-*/
-export function setStorage(option, value) {
-  localStorage.setItem(option, JSON.stringify(value));
-}
-
 export function injectBackgroundColor() {
   document.querySelector("body").id = "tag-recovery-body";
   const body = document.getElementById("tag-recovery-body");
@@ -44,11 +20,11 @@ export function getElements() {
 export function injectOptionsEventListeners() {
   const { expDaysNode } = getElements();
   expDaysNode.addEventListener("change", (e) =>
-    setStorage("expDays", e.target.value)
+    chrome.storage.local.set({ expDays: e.target.value })
   );
 }
-export function injectOptionsValues() {
+export async function injectOptionsValues({ expDaysValue }) {
   const { expDaysNode } = getElements();
-  const { expDays } = loadStorage();
-  expDaysNode.value = expDays;
+  console.log(expDaysValue);
+  expDaysNode.value = expDaysValue;
 }
