@@ -2,10 +2,13 @@
   import whiteLogo from "./../assets/main-logo-white-transparent.svg";
 </script>
 
-<img id="white-logo" src={whiteLogo} alt="Tag Recovery Logo" />
+<div id="logo-container">
+  <img src={whiteLogo} alt="Tag Recovery Logo" />
+</div>
 
 <style>
-  #white-logo {
+  #logo-container {
     width: 320px;
+    margin: 0 auto;
   }
 </style>

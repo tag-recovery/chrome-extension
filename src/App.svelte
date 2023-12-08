@@ -1,10 +1,10 @@
 <script>
+  import Main from "./components/Main.svelte";
   import Header from "./components/Header.svelte";
 </script>
 
-<main>
-  <Header />
-</main>
+<Header />
+<Main />
 
 <style>
 </style>
