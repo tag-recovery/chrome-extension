@@ -47,10 +47,12 @@ BY CURRENT USER
 IF NO STORAGE,
 CREATES EMPTY STARTER
 */
-export function loadStorage(username) {
+export function loadStorage(username, expDaysValue) {
+  console.log(expDaysValue);
   const result = JSON.parse(localStorage.getItem(username));
+  console.log(result);
   if (result) {
-    const filteredResult = checkExpByDays(result, 5);
+    const filteredResult = checkExpByDays(result, expDaysValue);
     return filteredResult;
   } else {
     localStorage.setItem(username, JSON.stringify([]));
