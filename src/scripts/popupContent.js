@@ -3,17 +3,12 @@ import {
   injectLogo,
   injectOptionsValues,
   injectOptionsEventListeners,
+  loadStorage,
 } from "./popupHelpers";
 
-// const elements = getElements();
-// let { expDaysNode } = elements;
-
-// const storage = loadStorage();
-// let { expDays } = storage;
-
-export function registerPopup() {
+export function registerPopup(expDaysValue) {
   injectBackgroundColor();
   injectLogo();
-  injectOptionsValues();
+  injectOptionsValues({ expDaysValue });
   injectOptionsEventListeners();
 }
