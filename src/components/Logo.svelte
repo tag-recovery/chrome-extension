@@ -1,5 +1,5 @@
 <script>
-  import whiteLogo from "./../assets/main-logo-white-transparent.svg";
+  import whiteLogo from "../assets/main-logo-white-transparent.svg";
 </script>
 
 <div id="logo-container">
