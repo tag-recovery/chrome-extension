@@ -34,7 +34,7 @@ export function grabElements() {
   const username = document
     .querySelector("form span.ljuser")
     .getAttribute("lj:user");
-  const textarea = document.querySelector("textarea");
+  const textarea = document.querySelector("textarea#body");
   let dwrpTools = document.querySelectorAll("input.custom-button");
   let prevTextArea = textarea.value;
 
