@@ -5,7 +5,6 @@ import {
   grabElements,
   debounce,
   createTag,
-  grabExpValue,
 } from "./iconHelpers";
 import storeProxy from "./store";
 
@@ -36,7 +35,7 @@ export function registerIcon(expDaysValue) {
       } else {
         console.log(result);
       }
-    }, 3500)
+    }, 5000)
   );
   if (dwrpTools) {
     /*
