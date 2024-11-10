@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@crxjs/vite-plugin": "^2.0.0-beta.12",
+    "@crxjs/vite-plugin": "^2.0.0-beta.28",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.31",
     "vite": "^4.5.5"
