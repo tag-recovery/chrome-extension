@@ -1,11 +1,26 @@
+function grabSelectedTextArea() {
+  if (document.querySelector("textarea#body")) {
+    return document.querySelector("textarea#body");
+  } else if (document.querySelector("textarea#draft")) {
+    return document.querySelector("textarea#draft");
+  } else {
+    throw new Error(
+      "Could not find appropriate textarea. Report bug to Tag Recovery developer."
+    );
+  }
+}
 function grabElements() {
   const username = document
     .querySelector("form span.ljuser")
     .getAttribute("lj:user");
-  const textarea = document.querySelector("textarea#body");
-  let dwrpTools = document.querySelectorAll("input.custom-button");
-  let prevTextArea = textarea.value;
-  return { username, textarea, prevTextArea, dwrpTools };
+  try {
+    const textarea = grabSelectedTextArea();
+    let dwrpTools = document.querySelectorAll("input.custom-button");
+    let prevTextArea = textarea.value;
+    return { username, textarea, prevTextArea, dwrpTools };
+  } catch (err) {
+    console.error(err.message);
+  }
 }
 
 function recordsCss() {
@@ -100,10 +115,17 @@ function checkExpByDays(data, amt) {
 }
 
 function findElementId() {
-  return (
-    document.getElementById("previewplaceholder") ||
-    document.getElementsByName("submitpreview")[0]
-  );
+  if (document.getElementById("previewplaceholder")) {
+    return document.getElementById("previewplaceholder");
+  } else if (document.getElementsByName("submitpreview")[0]) {
+    return document.getElementsByName("submitpreview")[0];
+  } else if (document.getElementById("prop_taglist")) {
+    return document.getElementById("prop_taglist");
+  } else {
+    throw new Error(
+      "Could not find appropriate placement for Tag Recovery icon. Report bug to Tag Recovery developer."
+    );
+  }
 }
 
 /* 
@@ -154,9 +176,12 @@ function injectIcon(data) {
       ? (recordsNode.className = "visible")
       : (recordsNode.className = "hide");
   });
-
-  const anchor = findElementId();
-  anchor.after(iconNode, recordsNode);
+  try {
+    const anchor = findElementId();
+    anchor.after(iconNode, recordsNode);
+  } catch (err) {
+    console.error(err.message);
+  }
 }
 
 function injectRecordEventListeners({
@@ -182,7 +207,7 @@ function injectRecordEventListeners({
     record.addEventListener("mouseover", (e) =>
       viewTag(textarea, sameRecord[0].tag)
     );
-    record.addEventListener("mouseout", (e) => reset());
+    record.addEventListener("mouseout", (e) => reset(textarea, prevTextArea));
   });
 }
 
@@ -235,7 +260,7 @@ function shiftTags(record, data) {
 RESETS THE TEXTAREA
 TO ITS PREVIOUS VALUE
 */
-function reset() {
+function reset(textarea, prevTextArea) {
   textarea.value = prevTextArea;
 }
 
@@ -261,10 +286,10 @@ const storeProxy = new Proxy(store, {
   set(obj, prop, value) {
     obj[prop] = value;
     if (prop === "data") {
-      localStorage.setItem(username, JSON.stringify(value));
+      const elements = grabElements();
+      localStorage.setItem(elements.username, JSON.stringify(value));
       const recordsNode = document.getElementById("records-wrap");
       recordsNode.innerHTML = recordsHtml(value);
-      const elements = grabElements();
       injectRecordEventListeners({ ...elements, value: value });
     }
     return true;
@@ -338,7 +363,7 @@ function iconHtml() {
 `;
 }
 
-function registerIcon(expDaysValue, elements) {
+async function registerIcon(expDaysValue, elements) {
   const { username, textarea, prevTextArea, dwrpTools } = elements;
   storeProxy.expDays = expDaysValue;
   injectIcon(storeProxy.data);
@@ -391,13 +416,17 @@ function registerIcon(expDaysValue, elements) {
   }
 }
 
-if (document.readyState !== "loading") {
-  chrome.storage.local.get(["expDays"]).then((result) => {
-    const elements = grabElements();
-    if (result.expDays) {
-      registerIcon(result.expDays, elements);
-    } else {
-      chrome.storage.local.set({ expDays: 3 }).then((res) => registerIcon(3));
-    }
-  });
-}
+document.addEventListener("readystatechange", (e) => {
+  if (document.readyState === "complete") {
+    chrome.storage.local.get(["expDays"]).then((result) => {
+      const elements = grabElements();
+      if (result.expDays) {
+        registerIcon(result.expDays, elements);
+      } else {
+        chrome.storage.local
+          .set({ expDays: 3 })
+          .then((res) => registerIcon(3, elements));
+      }
+    });
+  }
+});
