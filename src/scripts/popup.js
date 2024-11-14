@@ -18,7 +18,6 @@ function injectOptionsEventListeners() {
 }
 async function injectOptionsValues({ expDaysValue }) {
   const { expDaysNode } = getElements();
-  console.log(expDaysValue);
   expDaysNode.value = expDaysValue;
 }
 
@@ -28,15 +27,22 @@ function registerPopup(expDaysValue) {
   injectOptionsEventListeners();
 }
 
-if (document.readyState !== "loading") {
-  chrome.storage.local.get(["expDays"]).then((result) => {
-    if (result.expDays) {
-      registerPopup(result.expDays);
-    } else {
-      chrome.storage.local.set({ expDays: 3 }).then((res) => {
-        console.log(res);
-        registerPopup(3);
-      });
-    }
-  });
-}
+document.onreadystatechange = () => {
+  if (document.readyState === "complete") {
+    chrome.storage.local
+      .get(["expDays"])
+      .then((result) => {
+        if (result.expDays) {
+          registerPopup(result.expDays);
+        } else {
+          chrome.storage.local
+            .set({ expDays: 3 })
+            .then((res) => {
+              registerPopup(3);
+            })
+            .catch((err) => console.log(err));
+        }
+      })
+      .catch((err) => console.log(err));
+  }
+};
