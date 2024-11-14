@@ -386,6 +386,9 @@ async function registerIcon(expDaysValue, elements) {
     debounce((e) => {
       try {
         const prevTextArea = e.target.value;
+        if (prevTextArea.length < 1) {
+          return;
+        }
         const result = createTag(e.target.value);
         if (result.id) {
           storeProxy.data = [...storeProxy.data, result];
@@ -416,17 +419,25 @@ async function registerIcon(expDaysValue, elements) {
   }
 }
 
-document.addEventListener("readystatechange", (e) => {
-  if (document.readyState === "complete") {
-    chrome.storage.local.get(["expDays"]).then((result) => {
+function load() {
+  chrome.storage.local
+    .get(["expDays"])
+    .then((result) => {
       const elements = grabElements();
       if (result.expDays) {
         registerIcon(result.expDays, elements);
       } else {
         chrome.storage.local
           .set({ expDays: 3 })
-          .then((res) => registerIcon(3, elements));
+          .then((res) => registerIcon(3, elements))
+          .catch((err) => console.log(err));
       }
-    });
-  }
-});
+    })
+    .catch((err) => console.log(err));
+}
+
+const entries = performance.getEntriesByType("navigation");
+const entryTypes = entries.map((entry) => entry.type);
+if (entryTypes.includes("reload") || entryTypes.includes("navigate")) {
+  load();
+}
