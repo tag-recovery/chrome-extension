@@ -1,8 +1,1 @@
-{
-  "content_security_policy": {
-    "sandbox": "sandbox allow-scripts allow-forms allow-popups allow-modals; script-src-elem 'self' 'unsafe-inline' 'unsafe-eval'; child-src 'self'"
-  },
-  "sandbox": {
-    "pages": ["index.html"]
-  }
-}
+{}

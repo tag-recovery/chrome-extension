@@ -16,7 +16,10 @@ export default defineConfig(() => {
   const manifest = loadManifest(target);
 
   return {
-    plugins: [crx({ manifest }), vitePluginRunCommandOnDemand({})],
+    plugins: [
+      crx({ manifest, browser: target }),
+      vitePluginRunCommandOnDemand({}),
+    ],
     build: {
       outDir: `dist/${target}`,
     },

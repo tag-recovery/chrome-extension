@@ -28,5 +28,8 @@
       "resources": ["src/assets/css/styles.css"],
       "use_dynamic_url": false
     }
-  ]
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; script-src-elem 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
 }
