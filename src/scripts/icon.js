@@ -5,22 +5,29 @@ function grabSelectedTextArea() {
     return document.querySelector("textarea#draft");
   } else {
     throw new Error(
-      "Could not find appropriate textarea. Report bug to Tag Recovery developer."
+      "Could not find appropriate textarea. Report bug to Tag Recovery developer.",
     );
   }
 }
-function grabElements() {
-  const username = document
-    .querySelector("form span.ljuser")
-    .getAttribute("lj:user");
-  try {
-    const textarea = grabSelectedTextArea();
-    let dwrpTools = document.querySelectorAll("input.custom-button");
-    let prevTextArea = textarea.value;
-    return { username, textarea, prevTextArea, dwrpTools };
-  } catch (err) {
-    console.error(err.message);
+/* #cookieuser always holds the browser's logged-in user, unlike lj:user spans which can reference other posters/commenters */
+function grabLoggedInUsername() {
+  const cookieUserInput = document.querySelector(
+    "input[name='cookieuser']#cookieuser",
+  );
+  if (!cookieUserInput || !cookieUserInput.value) {
+    throw new Error(
+      "Could not find logged-in username (#cookieuser). Report bug to Tag Recovery developer.",
+    );
   }
+  return cookieUserInput.value;
+}
+
+function grabElements() {
+  const username = grabLoggedInUsername();
+  const textarea = grabSelectedTextArea();
+  let dwrpTools = document.querySelectorAll("input.custom-button");
+  let prevTextArea = textarea.value;
+  return { username, textarea, prevTextArea, dwrpTools };
 }
 
 function recordsCss() {
@@ -109,7 +116,7 @@ function checkExpByDays(data, amt) {
   const targetDate = new Date();
   targetDate.setDate(targetDate.getDate() - amt);
   const filteredData = data.filter(
-    (record) => new Date(record.timestamp) > targetDate
+    (record) => new Date(record.timestamp) > targetDate,
   );
   return filteredData;
 }
@@ -121,11 +128,43 @@ function findElementId() {
     return document.getElementsByName("submitpreview")[0];
   } else if (document.getElementById("prop_taglist")) {
     return document.getElementById("prop_taglist");
+  } else if (document.querySelector(".qr-footer")) {
+    /* last resort: drop it inside the footer itself rather than beside a specific control */
+    return document.querySelector(".qr-footer");
   } else {
     throw new Error(
-      "Could not find appropriate placement for Tag Recovery icon. Report bug to Tag Recovery developer."
+      "Could not find appropriate placement for Tag Recovery icon. Report bug to Tag Recovery developer.",
     );
   }
+}
+
+/*
+SHOWS A SMALL, DISMISSIBLE BADGE
+WHEN INJECTION FAILS SO IT ISN'T SILENTLY SWALLOWED
+*/
+function showErrorBadge(message) {
+  console.error(message);
+  if (document.getElementById("tag-recovery-error")) {
+    return;
+  }
+  const badge = document.createElement("div");
+  badge.id = "tag-recovery-error";
+  badge.style.cssText =
+    "position:fixed;bottom:12px;right:12px;z-index:99999;max-width:320px;" +
+    "background:#b30000;color:#fff;font-size:12px;font-family:sans-serif;" +
+    "padding:8px 28px 8px 10px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.3);";
+  badge.textContent = `Tag Recovery: ${message}`;
+
+  const closeBtn = document.createElement("button");
+  closeBtn.textContent = "\u00d7";
+  closeBtn.setAttribute("aria-label", "Dismiss Tag Recovery error");
+  closeBtn.style.cssText =
+    "position:absolute;top:2px;right:6px;background:none;border:none;" +
+    "color:#fff;font-size:14px;line-height:1;cursor:pointer;";
+  closeBtn.addEventListener("click", () => badge.remove());
+
+  badge.appendChild(closeBtn);
+  document.body.appendChild(badge);
 }
 
 /* 
@@ -176,12 +215,8 @@ function injectIcon(data) {
       ? (recordsNode.className = "visible")
       : (recordsNode.className = "hide");
   });
-  try {
-    const anchor = findElementId();
-    anchor.after(iconNode, recordsNode);
-  } catch (err) {
-    console.error(err.message);
-  }
+  const anchor = findElementId();
+  anchor.after(iconNode, recordsNode);
 }
 
 function injectRecordEventListeners({
@@ -192,6 +227,9 @@ function injectRecordEventListeners({
 }) {
   const recordsNode = document.getElementById("records-wrap");
   const recordsEl = document.querySelectorAll("#records-table tr");
+  if (recordsEl.length === 0) {
+    return;
+  }
   if (recordsEl.length < 2 && recordsEl[0].children[0].id === "no-texts") {
     return;
   }
@@ -205,7 +243,7 @@ function injectRecordEventListeners({
           : (recordsNode.className = "hide");
     });
     record.addEventListener("mouseover", (e) =>
-      viewTag(textarea, sameRecord[0].tag)
+      viewTag(textarea, sameRecord[0].tag),
     );
     record.addEventListener("mouseout", (e) => reset(textarea, prevTextArea));
   });
@@ -394,13 +432,13 @@ async function registerIcon(expDaysValue, elements) {
           storeProxy.data = [...storeProxy.data, result];
         } else {
           throw new Error(
-            "Error occured. Tag was unsuccessfully created. Report bug to Tag Recovery developer."
+            "Error occured. Tag was unsuccessfully created. Report bug to Tag Recovery developer.",
           );
         }
       } catch (err) {
         console.error(err.message);
       }
-    }, 3500)
+    }, 3500),
   );
   if (dwrpTools) {
     /*
@@ -425,15 +463,14 @@ function load() {
     .then((result) => {
       const elements = grabElements();
       if (result.expDays) {
-        registerIcon(result.expDays, elements);
+        return registerIcon(result.expDays, elements);
       } else {
-        chrome.storage.local
+        return chrome.storage.local
           .set({ expDays: 3 })
-          .then((res) => registerIcon(3, elements))
-          .catch((err) => console.log(err));
+          .then(() => registerIcon(3, elements));
       }
     })
-    .catch((err) => console.log(err));
+    .catch((err) => showErrorBadge(err.message));
 }
 
 const entries = performance.getEntriesByType("navigation");
