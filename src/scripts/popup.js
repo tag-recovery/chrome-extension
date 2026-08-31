@@ -1,3 +1,5 @@
+import browser from "webextension-polyfill";
+
 function injectBackgroundColor() {
   document.querySelector("body").id = "tag-recovery-body";
   const body = document.getElementById("tag-recovery-body");
@@ -13,7 +15,7 @@ function getElements() {
 function injectOptionsEventListeners() {
   const { expDaysNode } = getElements();
   expDaysNode.addEventListener("change", (e) =>
-    chrome.storage.local.set({ expDays: e.target.value })
+    browser.storage.local.set({ expDays: e.target.value })
   );
 }
 async function injectOptionsValues({ expDaysValue }) {
@@ -29,13 +31,13 @@ function registerPopup(expDaysValue) {
 
 document.onreadystatechange = () => {
   if (document.readyState === "complete") {
-    chrome.storage.local
+    browser.storage.local
       .get(["expDays"])
       .then((result) => {
         if (result.expDays) {
           registerPopup(result.expDays);
         } else {
-          chrome.storage.local
+          browser.storage.local
             .set({ expDays: 3 })
             .then((res) => {
               registerPopup(3);

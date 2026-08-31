@@ -1,3 +1,4 @@
+import browser from "webextension-polyfill";
 import {
   grabElements,
   loadStorage,
@@ -41,13 +42,13 @@ async function registerIcon(expDaysValue, elements) {
           storeProxy.data = [...storeProxy.data, result];
         } else {
           throw new Error(
-            "Error occured. Tag was unsuccessfully created. Report bug to Tag Recovery developer."
+            "Error occured. Tag was unsuccessfully created. Report bug to Tag Recovery developer.",
           );
         }
       } catch (err) {
         console.error(err.message);
       }
-    }, 3500)
+    }, 3500),
   );
   if (dwrpTools) {
     /*
@@ -67,14 +68,14 @@ async function registerIcon(expDaysValue, elements) {
 }
 
 function load() {
-  chrome.storage.local
+  browser.storage.local
     .get(["expDays"])
     .then((result) => {
       const elements = grabElements();
       if (result.expDays) {
         return registerIcon(result.expDays, elements);
       } else {
-        return chrome.storage.local
+        return browser.storage.local
           .set({ expDays: 3 })
           .then(() => registerIcon(3, elements));
       }
@@ -87,4 +88,3 @@ const entryTypes = entries.map((entry) => entry.type);
 if (entryTypes.includes("reload") || entryTypes.includes("navigate")) {
   load();
 }
-

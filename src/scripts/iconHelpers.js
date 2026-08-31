@@ -8,7 +8,7 @@ function grabSelectedTextArea() {
     return document.querySelector("textarea#draft");
   } else {
     throw new Error(
-      "Could not find appropriate textarea. Report bug to Tag Recovery developer."
+      "Could not find appropriate textarea. Report bug to Tag Recovery developer.",
     );
   }
 }
@@ -16,11 +16,11 @@ function grabSelectedTextArea() {
 /* #cookieuser always holds the browser's logged-in user, unlike lj:user spans which can reference other posters/commenters */
 function grabLoggedInUsername() {
   const cookieUserInput = document.querySelector(
-    "input[name='cookieuser']#cookieuser"
+    "input[name='cookieuser']#cookieuser",
   );
   if (!cookieUserInput || !cookieUserInput.value) {
     throw new Error(
-      "Could not find logged-in username (#cookieuser). Report bug to Tag Recovery developer."
+      "Could not find logged-in username (#cookieuser). Report bug to Tag Recovery developer.",
     );
   }
   return cookieUserInput.value;
@@ -42,7 +42,7 @@ function checkExpByDays(data, amt) {
   const targetDate = new Date();
   targetDate.setDate(targetDate.getDate() - amt);
   const filteredData = data.filter(
-    (record) => new Date(record.timestamp) > targetDate
+    (record) => new Date(record.timestamp) > targetDate,
   );
   return filteredData;
 }
@@ -59,7 +59,7 @@ function findElementId() {
     return document.querySelector(".qr-footer");
   } else {
     throw new Error(
-      "Could not find appropriate placement for Tag Recovery icon. Report bug to Tag Recovery developer."
+      "Could not find appropriate placement for Tag Recovery icon. Report bug to Tag Recovery developer.",
     );
   }
 }
@@ -169,7 +169,7 @@ export function injectRecordEventListeners({
           : (recordsNode.className = "hide");
     });
     record.addEventListener("mouseover", () =>
-      viewTag(textarea, sameRecord[0].tag)
+      viewTag(textarea, sameRecord[0].tag),
     );
     record.addEventListener("mouseout", () => reset(textarea, prevTextArea));
   });
