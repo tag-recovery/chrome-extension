@@ -12,7 +12,7 @@ function checkExpByDays(data, amt) {
   const targetDate = new Date();
   targetDate.setDate(targetDate.getDate() - amt);
   const filteredData = data.filter(
-    (record) => new Date(record.timestamp) > targetDate
+    (record) => new Date(record.timestamp) > targetDate,
   );
   return filteredData;
 }
@@ -31,9 +31,15 @@ function findElementId() {
 */
 
 export function grabElements() {
-  const username = document
-    .querySelector("form span.ljuser")
-    .getAttribute("lj:user");
+  const cookieUserInput = document.querySelector(
+    "input[name='cookieuser']#cookieuser",
+  );
+  if (!cookieUserInput || !cookieUserInput.value) {
+    throw new Error(
+      "Could not find logged-in username (#cookieuser). Report bug to Tag Recovery developer.",
+    );
+  }
+  const username = cookieUserInput.value;
   const textarea = document.querySelector("textarea#body");
   let dwrpTools = document.querySelectorAll("input.custom-button");
   let prevTextArea = textarea.value;
@@ -117,7 +123,7 @@ export function injectRecordEventListeners({
           : (recordsNode.className = "hide");
     });
     record.addEventListener("mouseover", (e) =>
-      viewTag(textarea, sameRecord[0].tag)
+      viewTag(textarea, sameRecord[0].tag),
     );
     record.addEventListener("mouseout", (e) => reset());
   });
