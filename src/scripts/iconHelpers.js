@@ -1,6 +1,11 @@
 import { recordsCss } from "./css";
 import { recordsHtml, iconHtml } from "./html";
 
+/* cheap, non-throwing check so pages without a comment form are silently skipped */
+export function hasCommentForm() {
+  return !!document.querySelector("textarea#body, textarea#draft");
+}
+
 function grabSelectedTextArea() {
   if (document.querySelector("textarea#body")) {
     return document.querySelector("textarea#body");
@@ -18,16 +23,26 @@ function grabLoggedInUsername() {
   const cookieUserInput = document.querySelector(
     "input[name='cookieuser']#cookieuser",
   );
-  if (!cookieUserInput || !cookieUserInput.value) {
-    throw new Error(
-      "Could not find logged-in username (#cookieuser). Report bug to Tag Recovery developer.",
-    );
+  if (cookieUserInput && cookieUserInput.value) {
+    return cookieUserInput.value;
   }
-  return cookieUserInput.value;
+  /* the usertype=cookieuser radio only exists when DW itself considers this browser logged in */
+  const pageThinksLoggedIn = document.querySelector(
+    "input[name='usertype'][value='cookieuser']",
+  );
+  if (!pageThinksLoggedIn) {
+    return null;
+  }
+  throw new Error(
+    "Could not find logged-in username (#cookieuser). Report bug to Tag Recovery developer.",
+  );
 }
 
 export function grabElements() {
   const username = grabLoggedInUsername();
+  if (!username) {
+    return null;
+  }
   const textarea = grabSelectedTextArea();
   let dwrpTools = document.querySelectorAll("input.custom-button");
   let prevTextArea = textarea.value;

@@ -1,6 +1,7 @@
 import browser from "webextension-polyfill";
 import {
   grabElements,
+  hasCommentForm,
   loadStorage,
   injectIcon,
   injectRecordEventListeners,
@@ -70,9 +71,15 @@ async function registerIcon(settings, elements) {
 }
 
 function load() {
+  if (!hasCommentForm()) {
+    return;
+  }
   loadSettings(browser)
     .then((settings) => {
       const elements = grabElements();
+      if (!elements) {
+        return;
+      }
       return registerIcon(settings, elements);
     })
     .catch((err) => showErrorBadge(err.message));
