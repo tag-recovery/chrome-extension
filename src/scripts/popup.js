@@ -1,4 +1,5 @@
 import browser from "webextension-polyfill";
+import { loadSettings } from "./settings";
 
 function injectBackgroundColor() {
   document.querySelector("body").id = "tag-recovery-body";
@@ -8,43 +9,36 @@ function injectBackgroundColor() {
 
 function getElements() {
   const expDaysNode = document.getElementById("expiration");
+  const debounceWaitNode = document.getElementById("debounceWait");
 
-  return { expDaysNode };
+  return { expDaysNode, debounceWaitNode };
 }
 
 function injectOptionsEventListeners() {
-  const { expDaysNode } = getElements();
+  const { expDaysNode, debounceWaitNode } = getElements();
   expDaysNode.addEventListener("change", (e) =>
-    browser.storage.local.set({ expDays: e.target.value }),
+    browser.storage.local.set({ expDays: Number(e.target.value) }),
+  );
+  debounceWaitNode.addEventListener("change", (e) =>
+    browser.storage.local.set({ debounceWait: Number(e.target.value) }),
   );
 }
-async function injectOptionsValues({ expDaysValue }) {
-  const { expDaysNode } = getElements();
-  expDaysNode.value = expDaysValue;
+async function injectOptionsValues({ expDays, debounceWait }) {
+  const { expDaysNode, debounceWaitNode } = getElements();
+  expDaysNode.value = expDays;
+  debounceWaitNode.value = debounceWait;
 }
 
-function registerPopup(expDaysValue) {
+function registerPopup(settings) {
   injectBackgroundColor();
-  injectOptionsValues({ expDaysValue });
+  injectOptionsValues(settings);
   injectOptionsEventListeners();
 }
 
 document.onreadystatechange = () => {
   if (document.readyState === "complete") {
-    browser.storage.local
-      .get(["expDays"])
-      .then((result) => {
-        if (result.expDays) {
-          registerPopup(result.expDays);
-        } else {
-          browser.storage.local
-            .set({ expDays: 3 })
-            .then((res) => {
-              registerPopup(3);
-            })
-            .catch((err) => console.log(err));
-        }
-      })
+    loadSettings(browser)
+      .then((settings) => registerPopup(settings))
       .catch((err) => console.log(err));
   }
 };

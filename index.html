@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -21,6 +21,19 @@
             >Tags expire after
             <input id="expiration" type="number" min="1" max="10" />
             days</label
+          >
+        </div>
+        <div class="options-container">
+          <label for="debounceWait"
+            >Save tag after
+            <input
+              id="debounceWait"
+              type="number"
+              min="500"
+              max="10000"
+              step="500"
+            />
+            ms of inactivity</label
           >
         </div>
         <div id="donation-buttons">

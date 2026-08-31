@@ -9,11 +9,13 @@ import {
   showErrorBadge,
 } from "./iconHelpers";
 import { createStore } from "./store";
+import { loadSettings } from "./settings";
 
-async function registerIcon(expDaysValue, elements) {
+async function registerIcon(settings, elements) {
+  const { expDays, debounceWait } = settings;
   const { username, textarea, prevTextArea, dwrpTools } = elements;
   const storeProxy = createStore(elements);
-  storeProxy.expDays = expDaysValue;
+  storeProxy.expDays = expDays;
   injectIcon(storeProxy.data);
   injectRecordEventListeners({
     textarea,
@@ -48,7 +50,7 @@ async function registerIcon(expDaysValue, elements) {
       } catch (err) {
         console.error(err.message);
       }
-    }, 3500),
+    }, debounceWait),
   );
   if (dwrpTools) {
     /*
@@ -68,17 +70,10 @@ async function registerIcon(expDaysValue, elements) {
 }
 
 function load() {
-  browser.storage.local
-    .get(["expDays"])
-    .then((result) => {
+  loadSettings(browser)
+    .then((settings) => {
       const elements = grabElements();
-      if (result.expDays) {
-        return registerIcon(result.expDays, elements);
-      } else {
-        return browser.storage.local
-          .set({ expDays: 3 })
-          .then(() => registerIcon(3, elements));
-      }
+      return registerIcon(settings, elements);
     })
     .catch((err) => showErrorBadge(err.message));
 }
