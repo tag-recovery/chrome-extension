@@ -1,6 +1,6 @@
 export const DEFAULT_SETTINGS = {
   expDays: 3,
-  debounceWait: 3500,
+  debounceWait: 5000,
 };
 
 /* seeds any missing keys in storage so later reads/popup display stay consistent */
