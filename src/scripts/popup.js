@@ -15,7 +15,7 @@ function getElements() {
 function injectOptionsEventListeners() {
   const { expDaysNode } = getElements();
   expDaysNode.addEventListener("change", (e) =>
-    browser.storage.local.set({ expDays: e.target.value })
+    browser.storage.local.set({ expDays: e.target.value }),
   );
 }
 async function injectOptionsValues({ expDaysValue }) {

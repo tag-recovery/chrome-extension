@@ -21,20 +21,12 @@
       "all_frames": true
     }
   ],
-  "permissions" : [
-    "storage"
-  ],
+  "permissions": ["storage", "tabs"],
   "web_accessible_resources": [
     {
-      "matches": [
-        "https://*.dreamwidth.org/*"
-      ],
-      "resources": [
-        "src/assets/css/styles.css"
-      ],
+      "matches": ["https://*.dreamwidth.org/*"],
+      "resources": ["src/assets/css/styles.css"],
       "use_dynamic_url": false
     }
-  ],
-  "content_security_policy": 
-  { "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; script-src-elem 'self' 'wasm-unsafe-eval'; object-src 'self'"}
+  ]
 }

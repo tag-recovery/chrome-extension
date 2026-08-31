@@ -12,5 +12,5 @@
     "skipLibCheck": true,
     "checkJs": false
   },
-  "include": ["src/**/*.js", "vite.config.js", "manifest.json"]
+  "include": ["src/**/*.js", "vite.config.js", "manifests/**/*.json"]
 }
