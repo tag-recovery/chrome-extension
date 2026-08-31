@@ -1,24 +1,23 @@
-import { grabElements, injectRecordEventListeners } from "./iconHelpers";
 import { recordsHtml } from "./html";
+import { injectRecordEventListeners } from "./iconHelpers";
 
-const elements = grabElements();
-const { username } = elements;
-
-const store = { data: [], expDays: undefined };
-const storeProxy = new Proxy(store, {
-  get(obj, prop) {
-    return obj[prop];
-  },
-  set(obj, prop, value) {
-    obj[prop] = value;
-    if (prop === "data") {
-      localStorage.setItem(username, JSON.stringify(value));
-      const recordsNode = document.getElementById("records-wrap");
-      recordsNode.innerHTML = recordsHtml(value);
-      injectRecordEventListeners({ ...elements, value: value });
-    }
-    return true;
-  },
-});
-
-export default storeProxy;
+/* one store per registerIcon() call, scoped to the elements grabbed for that page load */
+export function createStore(elements) {
+  const store = { data: [], expDays: undefined };
+  const storeProxy = new Proxy(store, {
+    get(obj, prop) {
+      return obj[prop];
+    },
+    set(obj, prop, value) {
+      obj[prop] = value;
+      if (prop === "data") {
+        localStorage.setItem(elements.username, JSON.stringify(value));
+        const recordsNode = document.getElementById("records-wrap");
+        recordsNode.innerHTML = recordsHtml(value);
+        injectRecordEventListeners({ ...elements, value, storeProxy });
+      }
+      return true;
+    },
+  });
+  return storeProxy;
+}

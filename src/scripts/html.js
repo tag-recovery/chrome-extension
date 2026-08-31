@@ -14,7 +14,6 @@ function formatDate(date) {
 }
 
 export function recordsHtml(records) {
-  console.log(records);
   let content = `
     <div id="tag-storage-container">
       <table id="records-table" role="grid">

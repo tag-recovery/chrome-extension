@@ -50,7 +50,7 @@ export function recordsCss() {
     -webkit-appearance: none;
     width: 10px;
   }
-  
+
   ::-webkit-scrollbar-thumb {
     border-radius: 5px;
     background-color: rgba(0, 0, 0, 0.5);

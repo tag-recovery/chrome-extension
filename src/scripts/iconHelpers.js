@@ -1,8 +1,38 @@
 import { recordsCss } from "./css";
 import { recordsHtml, iconHtml } from "./html";
-import { prevTextArea, textarea, username } from "./iconContent";
-import { nanoid } from "nanoid";
-import storeProxy from "./store";
+
+function grabSelectedTextArea() {
+  if (document.querySelector("textarea#body")) {
+    return document.querySelector("textarea#body");
+  } else if (document.querySelector("textarea#draft")) {
+    return document.querySelector("textarea#draft");
+  } else {
+    throw new Error(
+      "Could not find appropriate textarea. Report bug to Tag Recovery developer."
+    );
+  }
+}
+
+/* #cookieuser always holds the browser's logged-in user, unlike lj:user spans which can reference other posters/commenters */
+function grabLoggedInUsername() {
+  const cookieUserInput = document.querySelector(
+    "input[name='cookieuser']#cookieuser"
+  );
+  if (!cookieUserInput || !cookieUserInput.value) {
+    throw new Error(
+      "Could not find logged-in username (#cookieuser). Report bug to Tag Recovery developer."
+    );
+  }
+  return cookieUserInput.value;
+}
+
+export function grabElements() {
+  const username = grabLoggedInUsername();
+  const textarea = grabSelectedTextArea();
+  let dwrpTools = document.querySelectorAll("input.custom-button");
+  let prevTextArea = textarea.value;
+  return { username, textarea, prevTextArea, dwrpTools };
+}
 
 /*
 FILTERS THRU RECORDS
@@ -12,51 +42,65 @@ function checkExpByDays(data, amt) {
   const targetDate = new Date();
   targetDate.setDate(targetDate.getDate() - amt);
   const filteredData = data.filter(
-    (record) => new Date(record.timestamp) > targetDate,
+    (record) => new Date(record.timestamp) > targetDate
   );
   return filteredData;
 }
 
 function findElementId() {
-  return (
-    document.getElementById("previewplaceholder") ||
-    document.getElementsByName("submitpreview")[0]
-  );
-}
-
-/* 
-=======================
-|       EXPORTS       |
-=======================
-*/
-
-export function grabElements() {
-  const cookieUserInput = document.querySelector(
-    "input[name='cookieuser']#cookieuser",
-  );
-  if (!cookieUserInput || !cookieUserInput.value) {
+  if (document.getElementById("previewplaceholder")) {
+    return document.getElementById("previewplaceholder");
+  } else if (document.getElementsByName("submitpreview")[0]) {
+    return document.getElementsByName("submitpreview")[0];
+  } else if (document.getElementById("prop_taglist")) {
+    return document.getElementById("prop_taglist");
+  } else if (document.querySelector(".qr-footer")) {
+    /* last resort: drop it inside the footer itself rather than beside a specific control */
+    return document.querySelector(".qr-footer");
+  } else {
     throw new Error(
-      "Could not find logged-in username (#cookieuser). Report bug to Tag Recovery developer.",
+      "Could not find appropriate placement for Tag Recovery icon. Report bug to Tag Recovery developer."
     );
   }
-  const username = cookieUserInput.value;
-  const textarea = document.querySelector("textarea#body");
-  let dwrpTools = document.querySelectorAll("input.custom-button");
-  let prevTextArea = textarea.value;
-
-  return { username, textarea, prevTextArea, dwrpTools };
 }
 
-/* 
-RETIREVES STORAGE OBJECT 
+/*
+SHOWS A SMALL, DISMISSIBLE BADGE
+WHEN INJECTION FAILS SO IT ISN'T SILENTLY SWALLOWED
+*/
+export function showErrorBadge(message) {
+  console.error(message);
+  if (document.getElementById("tag-recovery-error")) {
+    return;
+  }
+  const badge = document.createElement("div");
+  badge.id = "tag-recovery-error";
+  badge.style.cssText =
+    "position:fixed;bottom:12px;right:12px;z-index:99999;max-width:320px;" +
+    "background:#b30000;color:#fff;font-size:12px;font-family:sans-serif;" +
+    "padding:8px 28px 8px 10px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.3);";
+  badge.textContent = `Tag Recovery: ${message}`;
+
+  const closeBtn = document.createElement("button");
+  closeBtn.textContent = "\u00d7";
+  closeBtn.setAttribute("aria-label", "Dismiss Tag Recovery error");
+  closeBtn.style.cssText =
+    "position:absolute;top:2px;right:6px;background:none;border:none;" +
+    "color:#fff;font-size:14px;line-height:1;cursor:pointer;";
+  closeBtn.addEventListener("click", () => badge.remove());
+
+  badge.appendChild(closeBtn);
+  document.body.appendChild(badge);
+}
+
+/*
+RETIREVES STORAGE OBJECT
 BY CURRENT USER
 IF NO STORAGE,
 CREATES EMPTY STARTER
 */
 export function loadStorage(username, expDaysValue) {
-  console.log(expDaysValue);
   const result = JSON.parse(localStorage.getItem(username));
-  console.log(result);
   if (result) {
     const filteredResult = checkExpByDays(result, expDaysValue);
     return filteredResult;
@@ -97,35 +141,37 @@ export function injectIcon(data) {
       ? (recordsNode.className = "visible")
       : (recordsNode.className = "hide");
   });
-
   const anchor = findElementId();
   anchor.after(iconNode, recordsNode);
 }
 
 export function injectRecordEventListeners({
-  username,
   textarea,
   prevTextArea,
   value,
+  storeProxy,
 }) {
   const recordsNode = document.getElementById("records-wrap");
   const recordsEl = document.querySelectorAll("#records-table tr");
+  if (recordsEl.length === 0) {
+    return;
+  }
   if (recordsEl.length < 2 && recordsEl[0].children[0].id === "no-texts") {
     return;
   }
   recordsEl.forEach((record) => {
     const sameRecord = value.filter((r) => r.id === record.id);
-    record.addEventListener("click", (e) => {
-      selectTag(username, textarea, prevTextArea, sameRecord[0]);
+    record.addEventListener("click", () => {
+      selectTag(textarea, sameRecord[0], storeProxy);
       recordsNode.className =
         recordsNode.className === "hide"
           ? (recordsNode.className = "visible")
           : (recordsNode.className = "hide");
     });
-    record.addEventListener("mouseover", (e) =>
-      viewTag(textarea, sameRecord[0].tag),
+    record.addEventListener("mouseover", () =>
+      viewTag(textarea, sameRecord[0].tag)
     );
-    record.addEventListener("mouseout", (e) => reset());
+    record.addEventListener("mouseout", () => reset(textarea, prevTextArea));
   });
 }
 
@@ -135,7 +181,7 @@ ADDS NEW TAG TO RECORDS STORE
 export function createTag(data) {
   try {
     const newTag = {
-      id: nanoid(),
+      id: (Math.random() + 1).toString(36).substring(2),
       tag: data,
       timestamp: new Date().getTime(),
     };
@@ -154,12 +200,11 @@ function viewTag(textarea, data) {
 }
 
 /*
-TAKES THE SELECTED TAG 
+TAKES THE SELECTED TAG
 AND MOVES IT TO THE FRONT AS THE LATEST TAG
 */
-function selectTag(username, textarea, prevTextArea, record) {
-  prevTextArea = record.tag;
-  textarea.value = prevTextArea;
+function selectTag(textarea, record, storeProxy) {
+  textarea.value = record.tag;
   storeProxy.data = shiftTags(record, storeProxy.data);
 }
 
@@ -174,15 +219,16 @@ function shiftTags(record, data) {
   filteredArray.push(record);
   return filteredArray;
 }
+
 /*
 RESETS THE TEXTAREA
 TO ITS PREVIOUS VALUE
 */
-function reset() {
+function reset(textarea, prevTextArea) {
   textarea.value = prevTextArea;
 }
 
-/* 
+/*
 WAITS FOR KEYUP EVENT TIMEOUT
 IF KEYUP RESUMES, TIMEOUT IS RESET
 */
