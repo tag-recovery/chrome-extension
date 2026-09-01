@@ -22,6 +22,13 @@ export default defineConfig(() => {
     ],
     build: {
       outDir: `dist/${target}`,
+      rollupOptions: {
+        input: {
+          index: "index.html",
+          installed: "installed.html",
+          whatsNew: "whats-new.html",
+        },
+      },
     },
   };
 });

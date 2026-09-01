@@ -1,11 +1,6 @@
 import browser from "webextension-polyfill";
 import { loadSettings } from "./settings";
-
-function injectBackgroundColor() {
-  document.querySelector("body").id = "tag-recovery-body";
-  const body = document.getElementById("tag-recovery-body");
-  body.style.backgroundColor = "#af6ec3";
-}
+import { injectBackgroundColor } from "./pageChrome";
 
 function getElements() {
   const expDaysNode = document.getElementById("expiration");
