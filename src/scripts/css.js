@@ -20,13 +20,38 @@ export function recordsCss() {
     width: 200px;
     text-align: right;
     margin-right: 10px;
+    font-size: .75em;
+    vertical-align: top;
+    color: rgba(0, 0, 0, 0.6);
   }
   #tag-recovery-container {
     margin-right: 5px;
+    height: 45px !important;
+    max-height: 45px !important;
+    width: 45px !important;
+    min-width: 45px !important;
+    max-width: 45px !important;
+    display: inline-flex;
+    flex: 0 0 45px;
+    justify-content: flex-end;
+    align-items: center;
   }
-  #tag-recovery:hover,
-  #tag-recovery:focus {
+  #tag-recovery-container > svg {
+    width: 40px !important;
+    max-width: 40px !important;
+    height: 40px !important;
+    max-height: 40px !important;
+  }
+    #tag-recovery-container > svg:hover {
+    width: 45px !important;
+    max-width: 45px !important;
+    height: 45px !important;
+    max-height: 45px !important;
+  }
+  #tag-recovery-container:hover,
+  #tag-recovery-container:focus {
     cursor: pointer;
+    background-color: rgba(0, 9, 40, 0.04);
   }
   #no-texts {
     background-color: rgba(0, 9, 40, 0.04);
@@ -61,8 +86,8 @@ export function recordsCss() {
     table-layout: fixed;
   }
   #tag-storage-container table tr {
-    border-bottom: 1px rgba(0, 9, 40, 0.085);
-    border-top: 1px rgba(0, 9, 40.085);
+    border-bottom: 1px solid rgba(0, 9, 40, 0.085);
+    border-top: 1px solid rgba(0, 9, 40, 0.085);
   }
   #tag-storage-container table tr:nth-child(even) {
     background-color: rgba(0, 9, 40, 0.04);
