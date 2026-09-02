@@ -1,3 +1,1 @@
-import { injectBackgroundColor } from "./pageChrome";
-
-injectBackgroundColor();
+import "../styles/whats-new.css";

@@ -1,27 +1,39 @@
 import browser from "webextension-polyfill";
-import { loadSettings } from "./settings";
+import { ICON_SVGS, loadSettings } from "./settings";
 import { injectBackgroundColor } from "./pageChrome";
+import "../styles/whats-new.css";
 
 function getElements() {
   const expDaysNode = document.getElementById("expiration");
   const debounceWaitNode = document.getElementById("debounceWait");
+  const iconNodes = document.querySelectorAll('input[name="logo"]');
 
-  return { expDaysNode, debounceWaitNode };
+  return { expDaysNode, debounceWaitNode, iconNodes };
 }
 
 function injectOptionsEventListeners() {
-  const { expDaysNode, debounceWaitNode } = getElements();
+  const { expDaysNode, debounceWaitNode, iconNodes } = getElements();
   expDaysNode.addEventListener("change", (e) =>
     browser.storage.local.set({ expDays: Number(e.target.value) }),
   );
   debounceWaitNode.addEventListener("change", (e) =>
     browser.storage.local.set({ debounceWait: Number(e.target.value) }),
   );
+  iconNodes.forEach((iconNode) =>
+    iconNode.addEventListener("change", (e) => {
+      if (e.target.checked) {
+        browser.storage.local.set({ icon: ICON_SVGS[e.target.value] });
+      }
+    }),
+  );
 }
-async function injectOptionsValues({ expDays, debounceWait }) {
-  const { expDaysNode, debounceWaitNode } = getElements();
+async function injectOptionsValues({ expDays, debounceWait, icon }) {
+  const { expDaysNode, debounceWaitNode, iconNodes } = getElements();
   expDaysNode.value = expDays;
   debounceWaitNode.value = debounceWait;
+  iconNodes.forEach((iconNode) => {
+    iconNode.checked = ICON_SVGS[iconNode.value] === icon;
+  });
 }
 
 function registerPopup(settings) {

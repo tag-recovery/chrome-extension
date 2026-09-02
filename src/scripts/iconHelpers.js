@@ -133,14 +133,14 @@ export function setStorage(username, value) {
   localStorage.setItem(username, JSON.stringify(value));
 }
 
-export function injectIcon(data) {
+export function injectIcon(data, iconSvg) {
   const style = document.createElement("style");
   style.innerHTML = recordsCss();
   document.getElementsByTagName("head")[0].appendChild(style);
 
   const iconNode = document.createElement("div");
   iconNode.id = "tag-recovery-container";
-  iconNode.innerHTML = iconHtml();
+  iconNode.innerHTML = iconSvg || iconHtml();
 
   const recordsNode = document.createElement("div");
   recordsNode.id = "records-wrap";

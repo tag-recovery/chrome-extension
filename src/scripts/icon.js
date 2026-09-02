@@ -13,11 +13,11 @@ import { createStore } from "./store";
 import { loadSettings } from "./settings";
 
 async function registerIcon(settings, elements) {
-  const { expDays, debounceWait } = settings;
+  const { expDays, debounceWait, icon } = settings;
   const { username, textarea, prevTextArea, dwrpTools } = elements;
   const storeProxy = createStore(elements);
   storeProxy.expDays = expDays;
-  injectIcon(storeProxy.data);
+  injectIcon(storeProxy.data, icon);
   injectRecordEventListeners({
     textarea,
     prevTextArea,

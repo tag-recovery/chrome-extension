@@ -2,34 +2,56 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/src/assets/img/icon-32.svg" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/src/assets/brand/favicon.svg"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>What's New in Tag Recovery</title>
-    <link rel="stylesheet" href="/src/assets/css/styles.css" />
   </head>
-  <body>
-    <div class="page-wrapper">
-      <div id="logo-container">
+  <body class="bg-paper font-body text-ink antialiased">
+    <main class="mx-auto max-w-2xl px-6 py-14 sm:py-20">
+      <div class="flex flex-wrap items-center gap-6">
         <img
-          src="/src/assets//img//main-logo-white-transparent.svg"
-          alt="Tag Recovery Logo"
+          src="/src/assets/brand/mascot-logo.svg"
+          alt="Tag Recovery"
+          class="w-40 sm:w-48"
         />
-      </div>
-      <div class="white-container page-container">
-        <h1>What's new in Tag Recovery</h1>
-        <div id="changelog-list"></div>
-        <div id="donation-buttons">
-          <p>Enjoying the update? Consider donating below!</p>
-          <a href="https://ko-fi.com/Z8Z8DBS8S" target="_blank">
-            <img
-              id="kofi-button"
-              src="https://storage.ko-fi.com/cdn/kofi1.png?v=3"
-              alt="Buy Me a Coffee at ko-fi.com"
-            />
-          </a>
+        <div class="min-w-52 flex-1">
+          <h1 class="font-display text-3xl font-semibold">What's new</h1>
+          <p class="mt-2 leading-relaxed text-ink/60">
+            Everything that has changed in Tag Recovery, newest first.
+          </p>
         </div>
       </div>
-    </div>
+
+      <section
+        class="mt-8 flex flex-wrap items-center gap-4 rounded-lg border border-lilac/60 bg-blush/25 px-6 py-5"
+      >
+        <p class="flex-1 text-sm leading-relaxed">
+          <strong class="font-display font-semibold"
+            >Tag Recovery is free and always will be.</strong
+          >
+          If it's saved you some heartbreak, consider donating! A Ko-fi helps me
+          keep it going.
+        </p>
+        <a
+          href="https://ko-fi.com/Z8Z8DBS8S"
+          target="_blank"
+          rel="noreferrer"
+          class="inline-flex items-center rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          ><img
+            src="/src/assets/kofi_symbol.webp"
+            alt="Ko-fi logo"
+            class="mr-2 h-4 w-4"
+          />Support on Ko-fi</a
+        >
+        >
+      </section>
+
+      <div id="changelog-list" class="mt-12 space-y-10"></div>
+    </main>
     <script type="module" src="/src/scripts/whatsNew.js"></script>
   </body>
 </html>
