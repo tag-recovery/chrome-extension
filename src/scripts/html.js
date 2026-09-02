@@ -3,12 +3,12 @@ FORMATS RECORD'S TIMESTAMP
 FROM LOCAL STORAGE
 */
 function formatDate(date) {
-  const hh = date.getHours() % 12 || 12;
+  const hh = date?.getHours() % 12 || 12;
   const min =
-    date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
-  const mm = date.getMonth() + 1;
-  const dd = date.getDate();
-  const mer = date.getHours() >= 12 ? "pm" : "am";
+    date?.getMinutes() < 10 ? `0${date?.getMinutes()}` : date?.getMinutes();
+  const mm = date?.getMonth() + 1;
+  const dd = date?.getDate();
+  const mer = date?.getHours() >= 12 ? "pm" : "am";
   const localDate = `${hh}:${min}${mer} - ${mm}/${dd}`;
   return localDate;
 }
@@ -25,9 +25,9 @@ export function recordsHtml(records) {
     </tr>`;
   } else {
     for (const record of records.toReversed()) {
-      content += `<tr id=${record.id} class="record-row">
-        <td class="tag-text">${record.tag}</td>
-        <td class="timestamp">${formatDate(new Date(record.timestamp))}</td>
+      content += `<tr id=${record?.id} class="record-row">
+        <td class="tag-text">${record?.tag}</td>
+        <td class="timestamp">${formatDate(new Date(record?.timestamp))}</td>
       </tr>`;
     }
   }
